@@ -3,28 +3,23 @@ package com.example.filepicker_kotlin
 import android.Manifest
 import android.R.attr
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.OpenableColumns
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import com.nbsp.materialfilepicker.MaterialFilePicker
-import com.nbsp.materialfilepicker.ui.FilePickerActivity
+import com.aditya.filebrowser.Constants
+import com.aditya.filebrowser.FileChooser
 import com.timelysoft.tsjdomcom.service.Status
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.util.regex.Pattern
 
 
 class MainActivity : AppCompatActivity() {
@@ -61,26 +56,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun launchPicker() {
-        MaterialFilePicker()
-            .withActivity(this)
-            .withRequestCode(FILE_PICKER_REQUEST_CODE)
-            .withHiddenFiles(true)
-//            .withPath(alarmsFolder.absolutePath)
-            // Root path (user won't be able to come higher than it)
-//            .withRootPath("/storage")
-            .withFilter(Pattern.compile(".*\\.(xlsx|xls)$"))
-            .withTitle("Select PDF file")
-            .start()
+        val i2 = Intent(applicationContext, FileChooser::class.java)
+        i2.putExtra(Constants.SELECTION_MODE, Constants.SELECTION_MODES.SINGLE_SELECTION)
+        startActivityForResult(i2, FILE_PICKER_REQUEST_CODE)
+//        MaterialFilePicker()
+//            .withActivity(this)
+//            .withRequestCode(FILE_PICKER_REQUEST_CODE)
+//            .withHiddenFiles(true)
+////            .withPath(alarmsFolder.absolutePath)
+//            // Root path (user won't be able to come higher than it)
+////            .withRootPath("/storage")
+//            .withFilter(Pattern.compile(".*\\.(xlsx|xls)$"))
+//            .withTitle("Select PDF file")
+//            .start()
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val path: String? = data?.getStringExtra(FilePickerActivity.RESULT_FILE_PATH)
+//            val path: String? = data?.getStringExtra(FilePickerActivity.RESULT_FILE_PATH)
+            val path = data?.data
             println()
             if (path != null) {
-                val file = File(path)
-                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                val file = File(path.path!!)
+                val requestFile = file.asRequestBody("*/*".toMediaTypeOrNull())
 
                 //попробуй отправить этот файл
                 //попроуй сделать запрос в этом проекте еслё все хорошо проёжет то тогда бует на тот проект переходить
